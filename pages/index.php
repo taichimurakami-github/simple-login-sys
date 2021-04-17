@@ -1,3 +1,21 @@
+<?php
+session_start();
+require("../Models/UserModel.php");
+$IS_LOGINED = false;
+/**
+ * ログイン状態のチェックを行う
+ */
+if(isset($_SESSION['UserModel'])){
+   if( !is_null($_SESSION['UserModel']) ){
+      /**
+       * ログインしていたら
+       * セッションを開始し、ユーザーモデルを変数に格納
+       */
+      $USER = unserialize($_SESSION['UserModel']);
+      $IS_LOGINED = true;
+   }
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -8,14 +26,19 @@
 </head>
 <body>
    <h1>Login Demo Page</h1>
-   <h2>
-      <?php
+   <?php
         /**
          * ログイン済み：ようこそ○○さん！
          * 未ログイン：<a href="./login.php">こちら</a>よりログインしてください。
          */
-      ?>
-   </h2>
+         if($IS_LOGINED):
+   ?>
+      <p>ようこそ<?php echo $USER->getUserName(); ?>さん！</p>
+
+   <?php else: ?>
+      <h2>ようこそ ゲスト さん！</h2>
+      <h2><a href="login.php">こちら</a>よりログインしてください。</h2>
+   <?php endif; ?>
    <div>
     <?php
       /**
@@ -23,7 +46,25 @@
        * 未ログイン：ログインシステムのでもページです。現在ログインしておりません。
        *            あとログアウトボタン表示
        */
+      if($IS_LOGINED):
     ?>
+      <a href="logout.php">ログアウト</a>
+      <a href="withdrawal.php">アカウント消去</a>
+      <h3><?php echo $USER->getUserName(); ?>さんのユーザーアカウント情報</h3>
+      <p>ユーザーID: <?php echo $USER->getUserId(); ?></p>
+      <p>ユーザーネーム: <?php echo $USER->getUserName(); ?></p>
+      <p>メールアドレス: <?php echo $USER->getEmail(); ?></p>
+      <p>パスワード: <?php echo $USER->getToken(); ?></p>
+      <p>トークン: <?php echo $USER->getToken(); ?></p>
+      <p>ログイン失敗回数: <?php echo $USER->getLoginFailureCount(); ?></p>
+      <p>最新のログイン失敗日時: <?php echo $USER->getLoginFailureDatetime(); ?></p>
+
+    <?php else: ?>
+      <p>ログインシステムのデモページです。現在ログインしておりません。</p>
+      <p>ログインは<a href="./login.php">こちら</a></p>
+      <p>アカウント登録は<a href="./register.php">こちら</a></p>
+
+    <?php endif; ?>
    </div>
    <footer>&copy; 2021 Taichi Murakami All rights reserved.</footer>
 </body>

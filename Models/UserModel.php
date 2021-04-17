@@ -1,8 +1,30 @@
 <?php
 namespace App\model;
 require("UserModelBase.php");
+require("../Handler/DbHandler.php");
+use App\common\DbHandler;
 
 class UserModel extends UserModelBase {
+
+  public static $isLogined = false;
+
+  /**
+   * POSTされたemail文字列より、データベースからユーザー情報を取得
+   * DbHandler::selectを使用する
+   * 
+   */
+  public function getModelByEmail($post_email)
+  {
+    $sql = "SELECT * FROM user01 WHERE email=:email";
+    $arr = array(
+      ":email" => $post_email
+    );
+    $result = DbHandler::select($sql, $arr)[0];
+    return is_null($result) ?
+      false :
+      $this->setPropertyAll($result);
+  }
+
   /**
    * パスワードの照合
    * 照合結果の成否をboolで返す
@@ -17,19 +39,19 @@ class UserModel extends UserModelBase {
   /**
    * アカウント情報を一括でUserModelクラスのプロパティに指定
    * @param char $data
-   * @return void
+   * @return bool
    */
   public function setPropertyAll($data)
   {
-    $this->setUserId($data['userId'])
-      ->setPassword($data['password'])
-      ->setUserName($data['userName'])
-      ->setEmail($data['email'])
-      ->setToken($data['token'])
-      ->setLoginFailureCount($data['loginFailureCount'])
-      ->setLoginFailureDatetime($data['loginFailureDatetime']);
-    
-    return;
+    $this->setUserId($data['userId']);
+    $this->setPassword($data['password']);
+    $this->setUserName($data['userName']);
+    $this->setEmail($data['email']);
+    $this->setToken($data['token']);
+    $this->setLoginFailureCount($data['loginFailureCount']);
+    $this->setLoginFailureDatetime($data['loginFailureDatetime']);
+
+    return true;
   }
 
   /**
@@ -40,11 +62,34 @@ class UserModel extends UserModelBase {
    */
   public function loginFailure(){
 
+    $this->_loginFailureDatetime = new \DateTime();
+    $this->_loginFailureCount++;
+
+    //Dbと接続
+
     return;
   }
 
-  private function isAccountLock()
+  /**
+   * 
+   */
+  public function isAccountLock()
   {
     return false;
+  }
+
+  public function loginFailureReset()
+  {
+    return true;
+  }
+
+  public function setLoginCondition()
+  {
+    return self::$isLogined = true;
+  }
+
+  public function unsetLoginCondition()
+  {
+    return self::$isLogined = false;
   }
 }

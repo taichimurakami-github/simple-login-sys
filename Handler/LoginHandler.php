@@ -1,9 +1,7 @@
 <?php
 namespace App\common;
-use App\model\UserModel,
-    App\common\DbHandler;
-// require("")
-
+require("../Models/UserModel.php");
+use App\model\UserModel;
 class LoginHandler {
 
   /**
@@ -26,13 +24,11 @@ class LoginHandler {
 
     /**
      * POSTされたemail情報をもとにユーザー情報を扱うUserModelクラスを作成する
+     * データベースより各プロパティを取り出し、objにセット
      */
     $userModel = new UserModel();
-    $AccountData = DbHandler::select($post_email);
-
-    //$post_emailをもとに、アカウント情報をデータベースから取り出し、UserModelクラスにセット
-    if(!$userModel->setPropertyAll($AccountData)){
-      throw new \Exception("Application Error");
+    if(!$userModel->getModelByEmail($post_email)){
+      throw new \Exception("Applicaton Error");
     }
 
     /**
@@ -52,10 +48,24 @@ class LoginHandler {
     if($userModel->isAccountLock()){
       throw new \Exception("Application Error");
     }
+
+    $userModel->loginFailureReset();
+    $userModel->setLoginCondition();
+
+    session_start();
+    $_SESSION['UserModel'] = serialize($userModel);
+    header(sprintf("location: %s", "./index.php"));
   }
 
+  /**
+   * ログアウトを行うメソッド
+   * 
+   * セッションを破棄する
+   * UserModelのログインコンディションをfalseに設定する
+   */
   public static function logout()
   {
-
+    session_destroy();
+    header(sprintf("location: %s", "./index.php"));
   }
 }
