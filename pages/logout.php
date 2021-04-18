@@ -1,5 +1,5 @@
 <?php
-require("../Handler/LoginHandler.php");
+require_once("../Handler/LoginHandler.php");
 session_start();
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
   App\common\LoginHandler::logout();
@@ -15,6 +15,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 </head>
 <body>
   <h1>Logout</h1>
+  <a href="index.php">TOPに戻る</a>
   <form action="" method="post">
     <p>ログアウトしますか？</p>
     <button type="submit">ログアウト</button>

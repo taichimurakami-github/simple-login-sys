@@ -1,6 +1,6 @@
 <?php
 namespace App\common;
-require("../Models/UserModel.php");
+require_once("../Models/UserModel.php");
 use App\model\UserModel;
 class LoginHandler {
 
@@ -55,6 +55,7 @@ class LoginHandler {
     session_start();
     $_SESSION['UserModel'] = serialize($userModel);
     header(sprintf("location: %s", "./index.php"));
+    return;
   }
 
   /**
@@ -62,10 +63,12 @@ class LoginHandler {
    * 
    * セッションを破棄する
    * UserModelのログインコンディションをfalseに設定する
+   * @return void
    */
   public static function logout()
   {
     session_destroy();
     header(sprintf("location: %s", "./index.php"));
+    return;
   }
 }

@@ -1,5 +1,5 @@
 <?php
-  require("../Handler/LoginHandler.php");
+  require_once("../Handler/LoginHandler.php");
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
     App\common\LoginHandler::login();

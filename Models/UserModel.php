@@ -1,7 +1,7 @@
 <?php
 namespace App\model;
-require("UserModelBase.php");
-require("../Handler/DbHandler.php");
+require_once("UserModelBase.php");
+require_once("../Handler/DbHandler.php");
 use App\common\DbHandler;
 
 class UserModel extends UserModelBase {
@@ -18,6 +18,18 @@ class UserModel extends UserModelBase {
     $sql = "SELECT * FROM user01 WHERE email=:email";
     $arr = array(
       ":email" => $post_email
+    );
+    $result = DbHandler::select($sql, $arr)[0];
+    return is_null($result) ?
+      false :
+      $this->setPropertyAll($result);
+  }
+
+  public function getModelByUserId($userId)
+  {
+    $sql = "SELECT * FROM user01 WHERE userId=:userId";
+    $arr = array(
+      ":userId" => $userId
     );
     $result = DbHandler::select($sql, $arr)[0];
     return is_null($result) ?

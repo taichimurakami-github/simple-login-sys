@@ -33,6 +33,11 @@ class DbHandler{
   static private $PDOinstance = null;
 
   /**
+   * その他データベース、テーブル関係の定数
+   */
+  const TBL_NAME = "user01";
+
+  /**
    * コンストラクタ
    * @return obj $PDOinstance
    */

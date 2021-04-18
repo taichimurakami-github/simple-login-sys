@@ -1,6 +1,6 @@
 <?php
 session_start();
-require("../Models/UserModel.php");
+require_once("../Models/UserModel.php");
 $IS_LOGINED = false;
 /**
  * ログイン状態のチェックを行う
@@ -33,7 +33,7 @@ if(isset($_SESSION['UserModel'])){
          */
          if($IS_LOGINED):
    ?>
-      <p>ようこそ<?php echo $USER->getUserName(); ?>さん！</p>
+      <p>ようこそ <?php echo $USER->getUserName(); ?> さん！</p>
 
    <?php else: ?>
       <h2>ようこそ ゲスト さん！</h2>
@@ -49,20 +49,24 @@ if(isset($_SESSION['UserModel'])){
       if($IS_LOGINED):
     ?>
       <a href="logout.php">ログアウト</a>
-      <a href="withdrawal.php">アカウント消去</a>
+      <a href="update.php">アカウント情報変更</a>
       <h3><?php echo $USER->getUserName(); ?>さんのユーザーアカウント情報</h3>
       <p>ユーザーID: <?php echo $USER->getUserId(); ?></p>
       <p>ユーザーネーム: <?php echo $USER->getUserName(); ?></p>
       <p>メールアドレス: <?php echo $USER->getEmail(); ?></p>
-      <p>パスワード: <?php echo $USER->getToken(); ?></p>
+      <p>パスワード: <?php echo $USER->getPassword(); ?></p>
       <p>トークン: <?php echo $USER->getToken(); ?></p>
       <p>ログイン失敗回数: <?php echo $USER->getLoginFailureCount(); ?></p>
       <p>最新のログイン失敗日時: <?php echo $USER->getLoginFailureDatetime(); ?></p>
 
+      <form action="withdrawal.php" method="post">
+         <button type="submit">アカウント消去</button>
+      </form>
+
     <?php else: ?>
       <p>ログインシステムのデモページです。現在ログインしておりません。</p>
-      <p>ログインは<a href="./login.php">こちら</a></p>
-      <p>アカウント登録は<a href="./register.php">こちら</a></p>
+      <p>ログインは<a href="login.php">こちら</a></p>
+      <p>アカウント登録は<a href="register.php">こちら</a></p>
 
     <?php endif; ?>
    </div>

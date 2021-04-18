@@ -1,5 +1,5 @@
 <?php
-  require("../Handler/AccountHandler.php");
+  require_once("../Handler/AccountHandler.php");
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
     App\common\AccountHandler::regist();
