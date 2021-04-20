@@ -47,11 +47,16 @@ class LoginHandler {
      */
     if($userModel->isAccountLock()){
       throw new \Exception("Application Error");
+    } else {
+      $userModel->loginFailureReset();
     }
 
-    $userModel->loginFailureReset();
-    $userModel->setLoginCondition();
 
+    /**
+     * ログイン成功
+     * セッションにUserModelを保存
+     * index.phpへ移動
+     */
     session_start();
     $_SESSION['UserModel'] = serialize($userModel);
     header(sprintf("location: %s", "./index.php"));

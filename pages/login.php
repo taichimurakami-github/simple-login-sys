@@ -15,6 +15,7 @@
 </head>
 <body>
    <h1>Login</h1>
+   <a href="index.php">TOPに戻る</a>
    <form action="" method="post">
     <p>メールアドレス</p>
     <input type="text" name="email" />

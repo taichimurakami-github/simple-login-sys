@@ -6,7 +6,7 @@
   $USER = unserialize($_SESSION['UserModel']);
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    App\common\AccountHandler::update();
+    App\common\AccountHandler::updateAccountInfo();
   }
 ?>
 <!DOCTYPE html>

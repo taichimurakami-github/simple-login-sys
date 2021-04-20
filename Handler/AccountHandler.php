@@ -20,7 +20,7 @@ class AccountHandler {
     /**
      * DbHandler::insertを利用
      */
-    $sql = sprintf("INSERT INTO %s(userName, email, password) VALUES (:userName, :email, :password)" , DbHandler::TBL_NAME);
+    $sql = sprintf("INSERT INTO %s(userName, email, password,) VALUES (:userName, :email, :password)" , DbHandler::TBL_NAME);
     $arr = array(
       ":userName" =>  $post_userName,
       ":email" => $post_email,
@@ -50,7 +50,7 @@ class AccountHandler {
    * POST経由で値を受け取る
    * ->入力値がなければ
    */
-  public static function update()
+  public static function updateAccountInfo()
   {
     if(!filter_input_array(INPUT_POST)){
       header("location: index.php");
