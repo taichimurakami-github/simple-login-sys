@@ -1,12 +1,13 @@
 <?php
   session_start();
+  require_once("../common.php");
   require_once("../Models/UserModel.php");
   require_once("../Handler/AccountHandler.php");
 
   $USER = unserialize($_SESSION['UserModel']);
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    App\common\AccountHandler::update();
+    App\common\AccountHandler::updateAccountInfo();
   }
 ?>
 <!DOCTYPE html>
@@ -15,7 +16,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Login System v1.0</title>
+  <title><?php echo APP_TITLE; ?></title>
 </head>
 <body>
    <h1>Update account info</h1>

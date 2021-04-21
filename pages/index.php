@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once("../common.php");
 require_once("../Models/UserModel.php");
 $IS_LOGINED = false;
 /**
@@ -22,16 +23,16 @@ if(isset($_SESSION['UserModel'])){
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Login System v1.0</title>
+  <title><?php echo APP_TITLE; ?></title>
 </head>
 <body>
    <h1>Login Demo Page</h1>
    <?php
-        /**
-         * ログイン済み：ようこそ○○さん！
-         * 未ログイン：<a href="./login.php">こちら</a>よりログインしてください。
-         */
-         if($IS_LOGINED):
+      /**
+       * ログイン済み：ようこそ○○さん！
+       * 未ログイン：<a href="./login.php">こちら</a>よりログインしてください。
+       */
+      if($IS_LOGINED):
    ?>
       <p>ようこそ <?php echo $USER->getUserName(); ?> さん！</p>
 
@@ -59,8 +60,9 @@ if(isset($_SESSION['UserModel'])){
       <p>ログイン失敗回数: <?php echo $USER->getLoginFailureCount(); ?></p>
       <p>最新のログイン失敗日時: <?php echo $USER->getLoginFailureDatetime(); ?></p>
 
-      <form action="withdrawal.php" method="post">
-         <button type="submit">アカウント消去</button>
+      <form action="withdrawal.php" method="post" onsubmit="return submitCheck();">
+         <button name="eraceAccount" type="submit">アカウント消去</button>
+         <style>button{background:red; color: white; font-weight: bold; font-size: 20px; width: 200px; height: 50px; cursor: pointer; margin: 50px 0 100px;}</style>
       </form>
 
     <?php else: ?>
@@ -72,4 +74,11 @@ if(isset($_SESSION['UserModel'])){
    </div>
    <footer>&copy; 2021 Taichi Murakami All rights reserved.</footer>
 </body>
+<script>
+   const btn = document.getElementsByTagName("button").item(0);
+
+   const submitCheck = () => {
+      return window.confirm("アカウントを消去しますか？") ? true : false;
+   }
+</script>
 </html>

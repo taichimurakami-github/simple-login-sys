@@ -6,12 +6,14 @@ use App\common\DbHandler;
 
 class UserModel extends UserModelBase {
 
+  const LF_ACCOUNT_LOCK = 3;
+
   public static $isLogined = false;
 
   /**
    * POSTされたemail文字列より、データベースからユーザー情報を取得
    * DbHandler::selectを使用する
-   * 
+   * @return bool
    */
   public function getModelByEmail($post_email)
   {
@@ -20,11 +22,17 @@ class UserModel extends UserModelBase {
       ":email" => $post_email
     );
     $result = DbHandler::select($sql, $arr)[0];
-    return is_null($result) ?
-      false :
-      $this->setPropertyAll($result);
+
+    return !is_null($result) ?
+      $this->setPropertyAll($result) :  
+      false ;
   }
 
+  /**
+   * 保持されているUserModel内のuserIdプロパティより、
+   * ユーザーモデルを取得する
+   * @return bool
+   */
   public function getModelByUserId($userId)
   {
     $sql = "SELECT * FROM user01 WHERE userId=:userId";
@@ -68,40 +76,57 @@ class UserModel extends UserModelBase {
 
   /**
    * ログイン失敗時に起動
-   * loginFailureCountが一定数であれば、アカウントをロックする
+   * loginFailureCountが一定数であれば、アカウントのロックフラグを起動
    * そうでなければ、loginFailureCount, loginFailureDatetimeを更新・インクリメントする
    * @return void;
    */
   public function loginFailure(){
-
-    $this->_loginFailureDatetime = new \DateTime();
-    $this->_loginFailureCount++;
-
+    $date = new \DateTime();
+    $a = $this->getLoginFailureCount() + 1;
+    echo "failureCount = ".$a."\n";
+    $this->setLoginFailureCount($a);
+    $this->setLoginFailureDatetime($date->format('Y-m-d H:i:s'));
+    echo $this->getLoginFailureCount();
     //Dbと接続
+    $sql = sprintf("UPDATE %s SET loginFailureCount=:LFCount, loginFailureDatetime=:LFDatetime WHERE userId=%s" , DbHandler::TBL_NAME, $this->getUserId() );
+    $arr = array(
+      ":LFCount" => $this->getLoginFailureCount(),
+      ":LFDatetime" => $this->getLoginFailureDatetime()
+    );
 
+    DbHandler::update($sql, $arr);
     return;
   }
 
   /**
-   * 
+   * アカウントのロックを判断
+   * UserModel::LF_ACCOUNT_LOCKを参照
+   * @return boolean
    */
   public function isAccountLock()
   {
-    return false;
+    return $this->getLoginFailureCount() > self::LF_ACCOUNT_LOCK ? true : false;
   }
 
+  /**
+   * loginFailureCount, loginFailureDatetimeをリセット
+   * @return void
+   */
   public function loginFailureReset()
   {
-    return true;
-  }
+    //LFCount,LFDatetimeをリセット
+    $this->setLoginFailureCount(0);
+    $this->setLoginFailureDatetime(null);
 
-  public function setLoginCondition()
-  {
-    return self::$isLogined = true;
-  }
+    //Dbと接続
+    $sql = sprintf("UPDATE %s SET loginFailureCount=:LFCount, loginFailureDatetime=:LFDatetime WHERE userId=%s" , DbHandler::TBL_NAME, $this->getUserId() );
+    // $sql = sprintf("UPDATE %s SET (loginFailureCount, loginFailureDatetime) VALUES (:LFCount, :LFDatetime)" , DbHandler::TBL_NAME );
+    $arr = array(
+      ":LFCount" => $this->getLoginFailureCount(),
+      ":LFDatetime" => $this->getLoginFailureDatetime()
+    );
 
-  public function unsetLoginCondition()
-  {
-    return self::$isLogined = false;
+    DbHandler::update($sql, $arr);
+    return;
   }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace App\common;
 require_once("../Models/UserModel.php");
+require_once("../ErrorHandler/ErrorHandler.php");
+require_once("../ErrorHandler/ExceptionCode.php");
 use App\model\UserModel;
 class LoginHandler {
 
@@ -28,7 +30,7 @@ class LoginHandler {
      */
     $userModel = new UserModel();
     if(!$userModel->getModelByEmail($post_email)){
-      throw new \Exception("Applicaton Error");
+      throw new InvalidErrorException(ExceptionCode::DB_CONNECT_GET_ERROR);
     }
 
     /**
@@ -39,19 +41,24 @@ class LoginHandler {
       //パスワード認証失敗
       //アカウントのloginFailureCount,Datetimeを更新
       $userModel->loginFailure();
-      throw new \Exception("invalid Error");
+      throw new InvalidErrorException(ExceptionCode::LOGIN_FAILED);
     }
 
     /**
      * アカウントがロックされているかどうかを確認する
      */
     if($userModel->isAccountLock()){
-      throw new \Exception("Application Error");
+      throw new InvalidErrorException(ExceptionCode::ACCOUNT_LOCKED);
+    } else {
+      $userModel->loginFailureReset();
     }
 
-    $userModel->loginFailureReset();
-    $userModel->setLoginCondition();
 
+    /**
+     * ログイン成功
+     * セッションにUserModelを保存
+     * index.phpへ移動
+     */
     session_start();
     $_SESSION['UserModel'] = serialize($userModel);
     header(sprintf("location: %s", "./index.php"));

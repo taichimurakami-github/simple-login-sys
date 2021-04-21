@@ -15,6 +15,7 @@ class DbHandler{
   const DB_NAME = "project_login";
   const HOST = "localhost";
   const CHARSET = "utf8mb4";
+  const TBL_NAME = "user01";
 
   /**
    * PDOの第2~4引数群の$username, $password, $driver_optionsの定義
@@ -32,10 +33,6 @@ class DbHandler{
    */
   static private $PDOinstance = null;
 
-  /**
-   * その他データベース、テーブル関係の定数
-   */
-  const TBL_NAME = "user01";
 
   /**
    * コンストラクタ
@@ -53,7 +50,6 @@ class DbHandler{
   private static function getInstance()
   {
     if(is_null(self::$PDOinstance)){
-
       /**
        * まだ生成されていなかったら、PDOインスタンスを生成し、返す。
        * 上記で定義した定数群を用いて引数の設定を行う。
@@ -72,7 +68,7 @@ class DbHandler{
          * SystemErrorExceptionを発生。
          * 処理を中断し、ログに記録ののち、管理者に連絡を送る
          */
-         throw new \Exception("System Error Exception");
+         throw new SystemErrorException(ExceptionCode::DB_CONNECT_GET_ERROR);
          exit($e->getMessage());
       }
 
@@ -168,5 +164,10 @@ class DbHandler{
   {
     $stmt = self::getInstance()->prepare($sql);
     return $stmt->execute($arr); 
+  }
+
+  public static function query($sql)
+  {
+    return self::getInstance()->query($sql);
   }
 }

@@ -7,7 +7,7 @@ class UserModelBase {
   protected $_userName = '';
   protected $_email = '';
   protected $_token = '';
-  protected $_loginFailureCount = '';
+  protected $_loginFailureCount = 0;
   protected $_loginFailureDatetime = '';
 
   /**

@@ -6,21 +6,47 @@ namespace App\common;
  */
 
 class ExceptionCode {
+  /**
+   * 1000番台：SystemErrorException関係
+   */
+  const UNDEFINED_ERROR = '1000';
+  const POST_ERROR = '1001';
+  const SESSION_ERROR = '1002';
+  const DB_CONNECT_GET_ERROR = '1003';
+  
+
+  /**
+   * 2000番台：ApplicationErrorException関係
+   */
+  const NO_ERROR_CODE = '2000';
+
+  /**
+   * 3000番台：InvalidErrorException関係
+   */
+  const LOGIN_FAILED = '3000';
+  const ACCOUNT_LOCKED = '3001';
+  const EMPTY_INPUT = '3002';
+
   static private $E_CODE_ARR = array(
     /**
-     * 1000番台：システムエラー関係
-     * 1000 ~ 1099 : 通信関係のエラー
-     * 1100 ~ 1199 : データベース関係のエラー
+     * 1000番台：SystemErrorException関係
      */
-    "1000" => "POST経由での値の受け渡しに失敗しました。",
-    "1001" => "SESSIONでの値の受け渡しに失敗しました。",
-    "1002" => "対応するエラーコードがありません",
+    self::POST_ERROR => "システム内部での値の受け渡しに失敗しました。",
+    self::SESSION_ERROR => "システム内部での値の受け渡しに失敗しました。",
+    self::DB_CONNECT_GET_ERROR => "アカウント情報が存在しません。もしくは、データベースとの通信に失敗しました。",
+    self::UNDEFINED_ERROR => "予期せぬエラーが発生しました。",
 
     /**
-     * 2000番台：アプリケーションエラー関係
-     * 2000 ~ 2099 : メソッド関係のエラー
+     * 2000番台：ApplicationErrorException関係
      */
-    "2001" => "引数の値が不正です"
+    self::NO_ERROR_CODE => "引数の値が不正です。",
+
+    /**
+     * 3000番台：InvalidErrorException関係
+     */
+    self::LOGIN_FAILED => "アカウントへのログインに失敗しました。メールアドレスまたはパスワードを正しく入力してください。",
+    self::ACCOUNT_LOCKED => "連続したログイン失敗のため、お使いのアカウントはロックされています。30分ほどおいてから再びログイン操作を行ってください。",
+    self::EMPTY_INPUT => "メールアドレスまたはパスワードが入力されていません。ログインページに戻って、もう一度入力してください。"
 
   );
 
@@ -32,27 +58,13 @@ class ExceptionCode {
   static public function getErrorMsg($err_code)
   {
     /**
-     * 引数が文字型以外で渡された時の処理
-     * 整数型の場合のみ型キャストを行い、それ以外はエラー
-     */
-    switch(gettype($err_code)){
-      case "string":
-        $err_code = (int) $err_code;
-        break;
-      case "integer":
-        break;
-      default:
-        throw new \Exception("引数の型エラー");
-    }
-
-    /**
      * 対応するエラーメッセージが存在すれば、メッセージを返す
      * なければ例外を発生させる
      */
     if(array_key_exists($err_code, self::$E_CODE_ARR)){
       return self::$E_CODE_ARR[$err_code];
     } else {
-      return self::$E_CODE_ARR["2001"];
+      return self::$E_CODE_ARR[self::NO_ERROR_CODE];
     }
 
   }
