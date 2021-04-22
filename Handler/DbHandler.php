@@ -1,6 +1,8 @@
 <?php
 namespace App\common;
 
+use Error;
+
 class DbHandler{
   /**
    * __PDO_SETTINGS__
@@ -81,40 +83,78 @@ class DbHandler{
   /**
    * トランザクション
    */
-  // private function beginTransaction()
-  // {
-  //   if(!$this->transactionCounter++){
-  //     return self::getInstance()::beginTransaction();
-  //   }
-  //   return $this->transactionCounter >= 0;
-  // }
+  public static function transaction()
+  {
+    // if(!$this->transactionCounter++){
+    //   return self::getInstance()::beginTransaction();
+    // }
+    // return $this->transactionCounter >= 0;
 
-  // /**
-  //  * コミット
-  //  */
-  // private function commit()
-  // {
-  //   if(!--$this->transactionCounter){
-  //     return self::getInstance()::commit();
-  //   }
+    return self::getInstance()->beginTransaction();
+  }
+
+  /**
+   * コミット
+   */
+  public static function commit()
+  {
+    // if(!--$this->transactionCounter){
+    //   return self::getInstance()::commit();
+    // }
     
-  //   return $this->transactionCounter >= 0;
-  // }
+    // return $this->transactionCounter >= 0;
 
-  // /**
-  //  * ロールバック
-  //  */
-  // public function rollback()
-  // {
-  //   if($this->transactionCounter >= 0)
-  //   {
-  //     $this->transactionCounter = 0;
-  //     return self::getInstance()::rollback();
-  //   }
+    return self::getInstance()->commit();
+  }
+
+  /**
+   * ロールバック
+   */
+  public static function rollback()
+  {
+    // if($this->transactionCounter >= 0)
+    // {
+    //   $this->transactionCounter = 0;
+    //   return self::getInstance()::rollback();
+    // }
   
-  //   $this->transactionCounter = 0;
-  //   return false;
-  // }
+    // $this->transactionCounter = 0;
+    // return false;
+
+    return self::getInstance()->rollback();
+  }
+
+  /**
+   * SQLインジェクション対策
+   * PDOStatement::bindValue()を実行
+   * 第一引数：PDO::prepare()の返り値
+   * 第二引数：$sqlプレースホルダの内容配列
+   * @param object $stmt
+   * @param array $arr
+   * @return void
+   */
+  private static function bindValue($stmt, $arr)
+  {
+    var_dump($arr);
+    foreach($arr as $key => $value)
+    {
+      echo " |||".gettype($value).": ".$key."=>".$value;
+      switch(gettype($value))
+      {
+        case "integer": 
+          $stmt->bindValue($key, $value, \PDO::PARAM_INT);
+          break;
+        case "string":
+          $stmt->bindValue($key, $value, \PDO::PARAM_STR);
+        case "NULL"://pattern of initialize Datetime object
+          break;
+        default:
+          throw new InvalidErrorException(ExceptionCode::INVALID_INPUT);
+      }
+    }
+
+    return;
+  }
 
   /**
    * SELECT実行
@@ -138,6 +178,7 @@ class DbHandler{
   public static function insert($sql, $arr)
   {
     $stmt = self::getInstance()->prepare($sql);
+    self::bindValue($stmt, $arr);
     $stmt->execute($arr);
     return self::getInstance()->lastInsertId();
   }
@@ -151,6 +192,7 @@ class DbHandler{
   public static function update($sql, $arr)
   {
     $stmt = self::getInstance()->prepare($sql);
+    self::bindValue($stmt, $arr);
     return $stmt->execute($arr);
   }
 
@@ -163,11 +205,17 @@ class DbHandler{
   public static function delete($sql, $arr)
   {
     $stmt = self::getInstance()->prepare($sql);
+    self::bindValue($stmt, $arr);
     return $stmt->execute($arr); 
   }
 
-  public static function query($sql)
-  {
-    return self::getInstance()->query($sql);
-  }
+  /**
+   * デバッグ用 PDO->query()実行関数
+   * SQLインジェクションなど、セキュリティ上の理由により
+   * 本番環境では無効化
+   */
+  // public static function query($sql)
+  // {
+  //   return self::getInstance()->query($sql);
+  // }
 }

@@ -17,14 +17,18 @@ class AccountHandler {
     $post_email = filter_input(INPUT_POST, "email");
     $post_password = filter_input(INPUT_POST, "password");
 
+
     /**
      * DbHandler::insertを利用
+     * PASSWORD_HASH関数を用いてパスワードを暗号化してからデータベースに保存
+     * ただし、アルゴリズムはPHPデフォルトのPASSWORD_DEFAULTを利用する。
+     * (このため、データベース側でのパスワードの指定はVARCHAR(255)としている。)
      */
     $sql = sprintf("INSERT INTO %s (userName, email, password) VALUES (:userName, :email, :password)" , DbHandler::TBL_NAME);
     $arr = array(
       ":userName" =>  $post_userName,
       ":email" => $post_email,
-      ":password" => $post_password
+      ":password" => password_hash($post_password, PASSWORD_DEFAULT)
     );
     DbHandler::insert($sql, $arr);
 

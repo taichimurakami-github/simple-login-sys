@@ -1,15 +1,16 @@
 <?php
+require("Security.php");
 /**
  * config variables
  */
-const VERSION = '1.00';
-const MODE = "DEVELOPMENT";
+const VERSION = '1.00';//Write as STRING
+const MODE = "DEVELOPMENT";//"DEVELOPMENT" or "PRODUCTION"
 const BASE_DIR = __DIR__;
 
 /**
  * web pages settings
  */
-const APP_TITLE = "simple-login-system ".VERSION;
+const APP_TITLE = "simple-login-system ".VERSION;//html title tag content
 
 /**
  * display errors setting

@@ -35,10 +35,11 @@
 
     <form action="" method="post">
       <style>
-        form{padding: 20px; margin-top: 50px; border: 3px solid red;}
+        form{padding: 20px 20px 35px; margin: 50px 0; border: 3px solid red;}
         input{display: block; margin-bottom: 15px;}
       </style>
       <p>アカウント情報を変更したい場合、以下を記入したうえで送信ボタンを押してください。</p>
+      <p>更新の必要がない項目は、入力しないまま送信しても大丈夫です。</p>
       <!-- <p>更新の必要がない場合、該当箇所は空欄のまま送信してください。</p> -->
       <input type="text" name="userName" placeholder="ユーザーネーム"/>
       <input type="text" name="email" placeholder="メールアドレス" />

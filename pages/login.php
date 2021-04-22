@@ -1,7 +1,8 @@
 <?php
   require_once("../common.php");
+  require_once("../Security.php");
   require_once("../Handler/LoginHandler.php");
-
+  use App\common\Csrf;
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
     App\common\LoginHandler::login();
   }
@@ -23,8 +24,8 @@
     <br>
     <p>パスワード</p>
     <input type="text" name="password" />
-
-    <button type="submit">ログイン</button>
+    <button style="display: block; margin-top: 50px;" type="submit">ログイン</button>
+    <input type="hidden" name="csrf_token" value="<?php Csrf::get(); ?>"/>
    </form>
    <footer>&copy; 2021 Taichi Murakami All rights reserved.</footer>
 </body>

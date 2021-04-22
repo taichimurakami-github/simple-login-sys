@@ -26,7 +26,7 @@
     <br>
     <p>パスワード</p>
     <input type="text" name="password" />
-
+    <input type="hidden" name="csrf_token" value="<?php App\common\Csrf::get(); ?>" />
     <button type="submit">上記の内容でアカウント登録する</button>
    </form>
    <footer>&copy; 2021 Taichi Murakami All rights reserved.</footer>

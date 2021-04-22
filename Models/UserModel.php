@@ -3,10 +3,17 @@ namespace App\model;
 require_once("UserModelBase.php");
 require_once("../Handler/DbHandler.php");
 use App\common\DbHandler;
+use Error;
 
 class UserModel extends UserModelBase {
 
+  /**
+   * アカウントロック時の設定
+   * LF_ACCOUNT_LOCK: アカウントロック発動条件となるログイン失敗回数
+   * LF_LOCK_MINUTE: アカウントロックの時間
+   */
   const LF_ACCOUNT_LOCK = 3;
+  const LF_LOCK_MINUTE = 1;
 
   public static $isLogined = false;
 
@@ -53,7 +60,8 @@ class UserModel extends UserModelBase {
    */
   public function checkPassword($post_password)
   {
-    return $this->_password === $post_password ? true : false;
+    $hash = $this->getPassword();
+    return password_verify($post_password, $hash) ? true : false;
   }
 
   /**
@@ -82,11 +90,9 @@ class UserModel extends UserModelBase {
    */
   public function loginFailure(){
     $date = new \DateTime();
-    $a = $this->getLoginFailureCount() + 1;
-    echo "failureCount = ".$a."\n";
-    $this->setLoginFailureCount($a);
+    $this->setLoginFailureCount($this->getLoginFailureCount() + 1);
     $this->setLoginFailureDatetime($date->format('Y-m-d H:i:s'));
-    echo $this->getLoginFailureCount();
+
     //Dbと接続
     $sql = sprintf("UPDATE %s SET loginFailureCount=:LFCount, loginFailureDatetime=:LFDatetime WHERE userId=%s" , DbHandler::TBL_NAME, $this->getUserId() );
     $arr = array(
@@ -100,12 +106,27 @@ class UserModel extends UserModelBase {
 
   /**
    * アカウントのロックを判断
-   * UserModel::LF_ACCOUNT_LOCKを参照
+   * UserModel::LF_ACCOUNT_LOCK, LF_LOCK_MINUTEを参照
    * @return boolean
    */
   public function isAccountLock()
   {
-    return $this->getLoginFailureCount() > self::LF_ACCOUNT_LOCK ? true : false;
+    $interval = new \DateInterval( sprintf('PT%dM', self::LF_LOCK_MINUTE) );
+    $LF_datetime = new \Datetime( $this->getLoginFailureDatetime() );
+    $LF_datetime->add($interval);
+
+    $nowDatetime = new \Datetime();
+
+    /**
+     * ログイン失敗回数が規定回数以上であり、
+     * かつログイン制限時間以内にログイン試行されている場合
+     */
+    if( $this->getLoginFailureCount() >= self::LF_ACCOUNT_LOCK && $nowDatetime < $LF_datetime )
+    {
+      return true;
+    }
+
+    return false;
   }
 
   /**
